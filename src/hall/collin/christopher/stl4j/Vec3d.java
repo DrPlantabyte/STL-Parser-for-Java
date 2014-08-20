@@ -201,4 +201,17 @@ public class Vec3d {
     public String toString() {
         return "Vec3d[" + x + ", " + y + ", " + z + "]";
     }
+	
+	/**
+	 * Calculates the angle between two vectors.
+	 * @param a A 3D vector
+	 * @param b Another 3D vector
+	 * @return The angle between the two vectors, in radians.
+	 */
+	public static double getAngle(Vec3d a, Vec3d b){
+		double AdotB = a.dot(b);
+		double A = a.length();
+		double B = b.length();
+		return Math.acos(AdotB / (A * B));
+	}
 }
