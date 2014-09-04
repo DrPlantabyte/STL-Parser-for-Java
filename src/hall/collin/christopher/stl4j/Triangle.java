@@ -36,7 +36,9 @@ public class Triangle {
 	private final Vec3d[] vertices;
 	private final Vec3d normal;
 	/**
-	 * Creates a triangle with the given vertices at its corners.
+	 * Creates a triangle with the given vertices at its corners. The normal is 
+	 * calculated by assuming that the vertices were provided in right-handed 
+	 * coordinate space (counter-clockwise)
 	 * @param v1 A corner vertex
 	 * @param v2 A corner vertex
 	 * @param v3 A corner vertex

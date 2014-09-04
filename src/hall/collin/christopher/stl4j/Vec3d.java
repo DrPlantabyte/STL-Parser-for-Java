@@ -23,8 +23,13 @@ SOFTWARE.
 */
 
 package hall.collin.christopher.stl4j;
-
-public class Vec3d {
+/**
+ * 3-Dimensional Vector implementation inspired by GLSL structure of the same 
+ * name. This class and all of its fields are final to optimize performance 
+ * under a functional programming model.
+ * @author CCHall
+ */
+public final class Vec3d {
     /**
      * The x coordinate.
      */
@@ -40,7 +45,12 @@ public class Vec3d {
      */
     public final double z;
 
-
+	/**
+	 * Constructs a 3D vector
+	 * @param x coordinate in the first dimension
+	 * @param y coordinate in the second dimension
+	 * @param z coordinate in the third dimension
+	 */
     public Vec3d(double x, double y, double z) {
         this.x = x;
         this.y = y;

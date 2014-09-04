@@ -38,10 +38,23 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * This class is a parser for STL files. Currently, normals specified in the 
+ * file are ignored and recalculated under the assumption that the coordinates 
+ * are provided in right-handed coordinate space (counter-clockwise).
  * @author CCHall
  */
 public class STLParser {
+	/**
+	 * Parses an STL file, attempting to automatically detect whether the file 
+	 * is an ASCII or binary STL file
+	 * @param filepath The file to parse
+	 * @return A list of triangles representing all of the triangles in the STL 
+	 * file.
+	 * @throws IOException Thrown if there was a problem reading the file 
+	 * (typically means the file does not exist or is not a file).
+	 * @throws IllegalArgumentException Thrown if the STL is not properly 
+	 * formatted
+	 */
 	public static List<Triangle> parseSTLFile(Path filepath) throws IOException{
 		byte[] allBytes = Files.readAllBytes(filepath);
 		// determine if it is ASCII or binary STL
@@ -64,6 +77,14 @@ public class STLParser {
 		}
 		return mesh;
 	}
+	/**
+	 * Reads an STL ASCII file content provided as a String
+	 * @param content ASCII STL
+	 * @return A list of triangles representing all of the triangles in the STL 
+	 * file.
+	 * @throws IllegalArgumentException Thrown if the STL is not properly 
+	 * formatted
+	 */
 	public static List<Triangle> readASCII(String content) {
 		Logger.getLogger(STLParser.class.getName()).log(Level.FINEST,"Parsing ASCII STL format");
 		// string is lowercase
@@ -120,7 +141,14 @@ public class STLParser {
 	}
 	
 	
-
+	/**
+	 * Parses binary STL file content provided as a byte array
+	 * @param allBytes binary STL
+	 * @return A list of triangles representing all of the triangles in the STL 
+	 * file.
+	 * @throws IllegalArgumentException Thrown if the STL is not properly 
+	 * formatted
+	 */
 	public static List<Triangle> readBinary(byte[] allBytes) {
 		Logger.getLogger(STLParser.class.getName()).log(Level.FINEST,"Parsing binary STL format");
 		DataInputStream in = new DataInputStream(new ByteArrayInputStream(allBytes));
@@ -135,16 +163,12 @@ public class STLParser {
 			triangles.ensureCapacity(numberTriangles);
 			// read triangles
 			try{
-				int dummy;
-				while((dummy = in.available()) > 0 ){
-					if(triangles.size() > 290){
-						int x = dummy;
-					}
+				while(in.available() > 0 ){
 					float[] nvec = new float[3];
 					for(int i = 0; i < nvec.length; i++){
 						nvec[i] = Float.intBitsToFloat(Integer.reverseBytes(in.readInt()));
 					}
-					Vec3d normal = new Vec3d(nvec[0],nvec[1],nvec[2]); // not used
+					Vec3d normal = new Vec3d(nvec[0],nvec[1],nvec[2]); // not used (yet)
 					Vec3d[] vertices = new Vec3d[3];
 					for (int v = 0; v < vertices.length; v++) {
 						float[] vals = new float[3];
@@ -153,16 +177,16 @@ public class STLParser {
 						}
 						vertices[v] = new Vec3d(vals[0], vals[1], vals[2]);
 					}
-					short attribute = Short.reverseBytes(in.readShort());
+					short attribute = Short.reverseBytes(in.readShort()); // not used (yet)
 					triangles.add(new Triangle(vertices[0], vertices[1], vertices[2]));
 				}
 			}catch(Exception ex){
 				throw new IllegalArgumentException("Malformed STL binary at triangle number " + (triangles.size()+1), ex);
 			}
 		}catch(IOException ex){
-			// IO exceptions are impossible with byte array input sreams, 
+			// IO exceptions are impossible with byte array input streams, 
 			// but still need to be caught
-			Logger.getLogger(STLParser.class.getName()).log(Level.SEVERE, "HOLY SHIT!", ex);
+			Logger.getLogger(STLParser.class.getName()).log(Level.SEVERE, "HOLY SHIT! A ByteArrayInputStream threw an exception!", ex);
 		}
 		return triangles;
 	}
